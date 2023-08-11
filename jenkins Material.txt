@@ -31,7 +31,7 @@ Integrate all the code and start testing (also called nightly builds), if any bu
 With jenkins:-  whenever dev commits, instantly it integrate the changes and test(unit) it (hardly it takes 10-15minites to report to dev)
 
 Benefits of CI/CD :- @ immediate bug deduction
-		 @ Minimal workflow:- integrating the latest changes and testing, if we want to continue like deployment and other steps...like pkg, deploy…etc Go head 
+		 @ Minimal workflow:- integrating the latest changes and testing, if we want to continue like deployment and other steps...like pkg, deployâ€¦etc Go head 
 		 @ we can deploy at any point of time
 		 @ record the build history for tracking
                  @ speed delivery 
@@ -87,23 +87,59 @@ Installation:
 
 Jenkins Installation in EC2
 ---------------------------
-1. sudo yum install java-1.8* -y
-2. sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-3. sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-4. sudo yum install jenkins -y
-5. sudo systemctl start jenkins (or) sudo service jenkins status
-6. open browser and give (ec2 public ip)3.14.29.65:8080
-7. open port in security groups
-     select security groups link->inbond rule->select rule->add 8080
+1.Sign in to the AWS Management Console.
+2.Open the Amazon EC2 console by selecting EC2 under Compute.
+3.In the left-hand navigation bar, select Security Groups, and then select Create Security Group.
+4.In Security group name, enter WebServerSG or any preferred name of your choice, and provide a description.
+5.Select your VPC from the list. You can use the default VPC.
+   a.On the Inbound tab, add the rules as follows:
+   b.Select Add Rule, and then select SSH from the Type list.
+   c.Under Source, select Custom, and in the text box, enter the IP address from step 1, followed by /32 indicating a single IP Address. For example, 
+     104.34.241.123/32 is a single IP address, while 198.51.100.2/24 results in a range of 256 IP addresses.
+   d.Select Add Rule, and then select HTTP from the Type list.
+   e.Select Add Rule, and then select Custom TCP Rule from the Type list.
+   f.Under Port Range, enter 8080.Select Create.
+6.Then launch the instance.
+7.open Mobaxterm and connect the instance.
+8.sudo yum update â€“y
+9.sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat-stable/jenkins.repo
+10.sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+11.sudo yum upgrade
+12.sudo amazon-linux-extras install java-openjdk11 -y
+13.sudo dnf install java-11-amazon-corretto -y
+14.sudo yum install jenkins -y
+15.sudo systemctl enable jenkins
+16.sudo systemctl start jenkins
+17.open browser ,public ip:8080
+18.Jenkins server will open as prompted, enter the password found in /var/lib/jenkins/secrets/initialAdminPassword.
+19.then give sudo cat /var/lib/jenkins/secrets/initialAdminPassword in local server for password.
+20.The Jenkins installation script directs you to the Customize Jenkins page. Click Install suggested plugins.
+21.Once the installation is complete, the Create First Admin User will open. Enter your information, and then select Save and Continue.
+22.On the left-hand side, select Manage Jenkins, and then select Manage Plugins.
+23.Select the Available tab, and then enter Amazon EC2 plugin at the top right.
+24.Select the checkbox next to Amazon EC2 plugin, and then select Install without restart.
+25.Once the installation is done, select Back to Dashboard.
+26.Select Configure a cloud if there are no existing nodes or clouds.
+27.If you already have other nodes or clouds set up, select Manage Jenkins.
+28.After navigating to Manage Jenkins, select Configure Nodes and Clouds from the left hand side of the page.
+29.From here, select Clouds.
+30.Select Add a new cloud, and select Amazon EC2. A collection of new fields appears.
+31.Click Add under Amazon EC2 Credentials.
+32.From the Jenkins Credentials Provider, select AWS Credentials as the Kind.
+33.Scroll down and enter in the IAM User programmatic access keys with permissions to launch EC2 instances and select Add.
+34.Scroll down to select your region using the drop-down, and select Add for the EC2 Key Pairâ€™s Private Key.
+35.From the Jenkins Credentials Provider, select SSH Username with private key as the Kind and set the Username to ec2-user.
+36.Scroll down and select Enter Directly under Private Key, then select Add.
+37.Open the private key pair you created in the creating a key pair step and paste in the contents from "-----BEGIN RSA PRIVATE KEY-----" to "-----END RSA PRIVATE KEY-----". Select Add when completed.
+38.Scroll down to "Test Connection" and ensure it states "Success". Select Save when done.
+39.You are now ready to use EC2 instances as Jenkins agents.
+40.
+
 -----
 Note-Points:-
 -----
-/var/lib/jenkins -->> jenkins installed place
-vi /var/lib/jenkins/config.xml -->> jenkins version
-vi /etc/sysconfig/jenkins -->> to change the port
-sudo systemctl restart jenkins
-open port in security groups
-(ec2 public ip)3.14.29.65:7070
+
 
 
 Archetecture:
@@ -153,9 +189,9 @@ Global Configuration( Go to Manage jenkins ---> Configure system)
 @ label:- group of servers
 @ Usage:- if we not configure(specify) any node, then the jobs will run by
       default in jenkins master server where Jenkins  installed.
-	E.g. if we want to get minimal things like time, mem usage…etc
+	E.g. if we want to get minimal things like time, mem usageâ€¦etc
 @ Quiet Period:- before executing particular task Jenkins put job on hold(wait)
-       for 5 sec e.g. any network issues…etc
+       for 5 sec e.g. any network issuesâ€¦etc
 @ SCM checkout retry count:- if jenkins is not connecting to any SCM Tools then it
      retries to connect.
 
@@ -226,7 +262,7 @@ Build Periodically: normal job
 
 Dependences:
 ===========
- (post build) : if the build get failed, now I need to send a email……
+ (post build) : if the build get failed, now I need to send a emailâ€¦â€¦
 	Up stream: before it proceeds to execute a job, it will check for dependences job and execute
 	Downstream: once we complete the job at the end it calls another job
 
@@ -261,14 +297,14 @@ Tomcat:
 Download and unzip tomcat and place it in one folder
 And start tomcat by startup.sh file in bin folder(bash startup.sh)
 Start tomcat : ./startup.sh   or  bash startup.sh(in git)
-Verufy if tomcat started by going browser – http://localhost:8080
+Verufy if tomcat started by going browser â€“ http://localhost:8080
 Verify if Jenkins is running on tomcat : http://localhost:8080/jenkins
 
 By default Jenkins also run on port 8080. So, now run Jenkins in standalone.
 --> If i want to run Jenkins in standalone then go to Jenkins folder and type below
-	Java -jar Jenkins. War –httpPort=9090. Note: - both will not run on same port 8080.
+	Java -jar Jenkins. War â€“httpPort=9090. Note: - both will not run on same port 8080.
 
-Note:- Here in Port “P” is capital 
+Note:- Here in Port â€œPâ€ is capital 
 Note:- to change port in tomcat got to config-->server XML files
 Note:- to chang port for jenkins go to D:\jenkins_home-2.73.2\   jave -jar jenkins.war  --httpPort=9090
 Note:- to change user,role, and password got to tomcat-users xml files, and give below details
@@ -357,7 +393,7 @@ Users:
 Create new users
 Configure users
 Create and manage user roles
-Roles strategy plugin – download – restart Jenkin
+Roles strategy plugin â€“ download â€“ restart Jenkin
 
 CatLight:
 ---------
